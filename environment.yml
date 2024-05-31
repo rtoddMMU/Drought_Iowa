@@ -1,0 +1,12 @@
+name: drought
+channels:
+  - conda-forge
+  - base
+  - R
+  - bioconda
+dependencies:
+  - r-base=4.3.3
+  - r-tidyverse=2.0.0
+  - snakemake=8.12.0
+  - graphviz=11.0.0
+  
