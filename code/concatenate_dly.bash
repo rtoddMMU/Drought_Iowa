@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-tar Oxvzt data/ghcnd_all.tar.gz | gzip > data/ghcnd_cat.gz
+tar Oxvzf data/ghcnd_all.tar.gz | grep "PRCP" | gzip > data/ghcnd_cat.gz
