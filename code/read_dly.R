@@ -1,5 +1,7 @@
 library(tidyverse)
 library(glue)
+library(lubridate)
+library(archive)
 #------------------------------
 #Variable   Columns   Type
 #------------------------------
@@ -34,17 +36,32 @@ quadruple <- function(x) {
 widths <- c(11,4,2,4,rep(c(5,1,1,1),31))
 headers <- c("ID","YEAR","MONTH","ELEMENT",unlist(map(1:31,quadruple)))
 
-dly_files <- list.files("data/ghcnd_all",full.name=TRUE)
+dly_files <- archive('data/ghcnd_all.tar.gz') %>%
+    filter(str_detect(path,'dly')) %>%
+    slice_sample(n=5) %>%
+    pull(path)
 
-read_fwf(dly_files,fwf_widths(widths,headers), 
+Sys.time()
+dly_files %>% 
+#dly_files <- list.files("data/ghcnd_all",full.name=TRUE)
+map_dfr(.,~read_fwf(archive_read('data/ghcnd_all.tar.gz',.x),
+        fwf_widths(widths,headers), 
         na = c("NA","-9999"),
         col_types=cols(.default=col_character()),
-        col_select=c(ID,YEAR,MONTH,ELEMENT,starts_with("VALUE"))) %>% 
+        col_select=c(ID,YEAR,MONTH,ELEMENT,starts_with("VALUE")))) 
+Sys.time()        
+%>% 
 rename_all(tolower) %>%
 filter(element=="PRCP") %>%
 select(-element) %>%
 pivot_longer(cols=starts_with("value"),
                 names_to = "day",
-                values_to = "prcp")
+                values_to = "prcp") %>%
+drop_na() %>%
+mutate(day=str_replace(day,"value",""),
+        date=ymd(glue("{year}-{month}={day}")),
+        prcp=as.numeric(prcp)/100 #prcp in cm
+        ) %>%
+select(id,date,prcp) %>%
+write_tsv("data/composite_dly.tsv")
 
-#CC249 24:30 in Riffamonas.
