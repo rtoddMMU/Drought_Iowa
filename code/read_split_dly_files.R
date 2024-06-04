@@ -67,19 +67,21 @@ process_xfiles <- function(x){
         pivot_longer(cols=starts_with("value"),
                         names_to = "day",
                         values_to = "prcp") %>%
-        drop_na() %>%
-        filter(prcp != 0) %>%
+        #drop_na() %>%
+        #filter(prcp != 0) %>%
         mutate(day=str_replace(day,"value",""),
-                date=ymd(glue("{year}-{month}={day}")),
+                date=ymd(glue("{year}-{month}={day}"),quiet=TRUE),
+                prcp=replace_na(prcp,"0"), #This is a choice. It probably won't have a big effect.
                 prcp=as.numeric(prcp)/100 #prcp in cm
                 ) %>%
+        drop_na(date) %>%
         select(id,date,prcp) %>%
                 mutate(julian_day = yday(date),
                         diff=tday_julian - julian_day,
                         is_in_window=case_when(diff < window & diff > 0 ~ TRUE,
-                                diff > window ~ FALSE,
-                                tday_julian < window & diff + 365 < window ~ TRUE, 
-                                diff < 0 ~ FALSE),
+                                        diff > window ~ FALSE,
+                                        tday_julian < window & diff + 365 < window ~ TRUE, 
+                                        diff < 0 ~ FALSE),
                         year=year(date),
                         year=if_else(diff < 0 & is_in_window, year+1,year)
                         ) %>%
