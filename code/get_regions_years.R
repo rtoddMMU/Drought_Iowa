@@ -24,8 +24,8 @@ read_fwf("data/ghcnd-inventory.txt",
            last_year = c(42, 45))
          ) %>%
        filter(element == "PRCP") %>%
-  mutate(latitude = round(latitude, 0),
-         longitude = round(longitude, 0)) %>%
+  mutate(latitude = round(latitude, 3),
+         longitude = round(longitude, 3)) %>%
   group_by(longitude, latitude) %>%
   mutate(region = cur_group_id()) %>%
   select(-element) %>%
