@@ -1,2 +1,2 @@
 # Drought_1
-Re-Doing the Riffamonas Drought project after uninstalling Anaconda for windows and installing miniconda on WSL. 
+Re-Doing the Riffamonas Drought But plotting all weather stations in iowa.
